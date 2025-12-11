@@ -12,23 +12,17 @@ CONTENTS                                              *tetris-delete-contents*
     4. Usage ............................... |tetris-delete-usage|
     5. Commands ............................ |tetris-delete-commands|
     6. Configuration ....................... |tetris-delete-configuration|
-    7. Mappings ............................ |tetris-delete-mappings|
 
 ==============================================================================
 INTRODUCTION                                      *tetris-delete-introduction*
 
-vim-tetris-delete is a NeoVim plugin that provides a fun, Tetris-style
-animation when deleting lines. The deleted text is split into colorful
-floating windows that fall down and move to a clipboard window.
-
-This plugin is perfect for those who want to add some visual flair to their
-text editing experience and maintain a visual clipboard history.
+vim-tetris-delete provides a fun Tetris-style animation when deleting lines.
+The deleted text splits into colorful floating windows that fall down.
 
 ==============================================================================
 REQUIREMENTS                                      *tetris-delete-requirements*
 
 - NeoVim 0.4.0 or later (floating window support required)
-- GUI or terminal with true color support (for colored windows)
 
 ==============================================================================
 INSTALLATION                                      *tetris-delete-installation*
@@ -45,90 +39,30 @@ Using packer.nvim: >
 Using lazy.nvim: >
     { 'Rasukarusan/vim-tetris-delete' }
 <
-Manual installation:
-Clone this repository to your pack directory: >
-    git clone https://github.com/Rasukarusan/vim-tetris-delete \
-        ~/.local/share/nvim/site/pack/plugins/start/vim-tetris-delete
-<
 ==============================================================================
 USAGE                                                    *tetris-delete-usage*
 
-1. Open a file in NeoVim
-2. Move cursor to a line you want to delete
-3. Press `T` (default mapping) or run `:TetrisDelete`
-4. Watch the line split into colorful blocks that fall and fly to the
-   clipboard window!
-
-The deleted lines are stored in the clipboard window for reference.
+1. Move cursor to a line you want to delete
+2. Run `:TetrisDelete`
+3. Watch the line split into colorful blocks and fall!
 
 ==============================================================================
 COMMANDS                                              *tetris-delete-commands*
 
                                                               *:TetrisDelete*
 :TetrisDelete
-    Delete the current line with Tetris-style animation. The text will be
-    split into colored blocks, fall down, and move to the clipboard window.
-
-                                                          *:TetrisDeleteOpen*
-:TetrisDeleteOpen
-    Open the clipboard window. This window displays all lines that have been
-    deleted using the Tetris animation.
-
-                                                         *:TetrisDeleteClose*
-:TetrisDeleteClose
-    Close the clipboard window.
-
-                                                        *:TetrisDeleteToggle*
-:TetrisDeleteToggle
-    Toggle the clipboard window visibility.
+    Delete the current line with Tetris-style falling animation.
 
 ==============================================================================
 CONFIGURATION                                    *tetris-delete-configuration*
 
-                                                       *g:tetris_delete_key*
-g:tetris_delete_key (default: 'T')
-    The key mapping for triggering Tetris delete in normal mode. >
-        let g:tetris_delete_key = '<Leader>d'
-<
                                                  *g:tetris_delete_split_num*
 g:tetris_delete_split_num (default: 7)
     Number of blocks to split the line into. >
         let g:tetris_delete_split_num = 5
 <
-                                            *g:tetris_delete_clipboard_width*
-g:tetris_delete_clipboard_width (default: 0.4)
-    Width of the clipboard window as a ratio of the editor width (0.0-1.0). >
-        let g:tetris_delete_clipboard_width = 0.3
+Key mapping example: >
+    nnoremap <silent> T :TetrisDelete<CR>
 <
-                                           *g:tetris_delete_clipboard_height*
-g:tetris_delete_clipboard_height (default: 0.8)
-    Height of the clipboard window as a ratio of the editor height (0.0-1.0). >
-        let g:tetris_delete_clipboard_height = 0.6
-<
-                                            *g:tetris_delete_clipboard_blend*
-g:tetris_delete_clipboard_blend (default: 60)
-    Transparency of the clipboard window (0-100, 0=opaque, 100=transparent). >
-        let g:tetris_delete_clipboard_blend = 40
-<
-                                            *g:tetris_delete_auto_clipboard*
-g:tetris_delete_auto_clipboard (default: 1)
-    Automatically open clipboard window when running TetrisDelete if not
-    already open. Set to 0 to disable. >
-        let g:tetris_delete_auto_clipboard = 0
-<
-                                              *g:tetris_delete_no_mappings*
-g:tetris_delete_no_mappings (default: 0)
-    Set to 1 to disable default key mappings. You can then define your own: >
-        let g:tetris_delete_no_mappings = 1
-        nnoremap <silent> <Leader>td :TetrisDelete<CR>
-<
-==============================================================================
-MAPPINGS                                              *tetris-delete-mappings*
-
-Default mappings (can be disabled with |g:tetris_delete_no_mappings|):
-
-    Normal mode:
-    T                   Trigger Tetris delete on current line
-
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:

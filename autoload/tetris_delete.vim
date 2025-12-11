@@ -2,41 +2,6 @@
 " Maintainer: Rasukarusan
 " License: MIT
 
-" Check if clipboard window exists
-function! s:is_exist_clipboard_window() abort
-    return get(g:, 'tetris_delete_clipboard_wid', 0) != 0
-        \ && nvim_win_is_valid(g:tetris_delete_clipboard_wid) == v:true
-endfunction
-
-" Create clipboard window
-function! s:create_clipboard_window() abort
-    if s:is_exist_clipboard_window()
-        return g:tetris_delete_clipboard_wid
-    endif
-
-    let window_width = nvim_win_get_width(0)
-    let window_height = nvim_win_get_height(0)
-    let width = float2nr(window_width * g:tetris_delete_clipboard_width)
-    let config = {
-        \ 'relative': 'editor',
-        \ 'row': 1,
-        \ 'col': window_width - width,
-        \ 'width': width,
-        \ 'height': float2nr(window_height * g:tetris_delete_clipboard_height),
-        \ 'anchor': 'NW',
-        \ 'style': 'minimal',
-        \ }
-
-    let win_id = s:create_window(config)
-    hi TetrisDeleteClipboard guifg=#ffffff guibg=#aff577
-    call nvim_win_set_option(win_id, 'winhighlight', 'Normal:TetrisDeleteClipboard')
-    call nvim_win_set_option(win_id, 'winblend', g:tetris_delete_clipboard_blend)
-    call nvim_win_set_config(win_id, config)
-    set nowrap
-
-    return win_id
-endfunction
-
 " Create a floating window
 function! s:create_window(config) abort
     let buf = nvim_create_buf(v:false, v:true)
@@ -58,11 +23,9 @@ endfunction
 
 " Get column offset
 function! s:get_col() abort
-    " when `set nonumber` not need adjustment
     if &number == 0
         return 0
     endif
-    " not support over 1000 line file
     return 4
 endfunction
 
@@ -97,6 +60,11 @@ function! s:fall_window(win_id) abort
         call s:move_floating_window(a:win_id, config.relative, config.row + y + 1, config.col)
         sleep 4ms
     endfor
+endfunction
+
+" Generate random number
+function! s:random(max) abort
+    return str2nr(matchstr(reltimestr(reltime()), '\v\.@<=\d+')[1:]) % a:max
 endfunction
 
 " Set random color to window
@@ -141,123 +109,22 @@ function! s:create_words_window() abort
     return win_ids
 endfunction
 
-" Move window to clipboard window with animation
-function! s:move_split_window_to_clip_window(win_id) abort
-    let clipboard_config = nvim_win_get_config(g:tetris_delete_clipboard_wid)
-    let clipboard = s:winid2tabnr(g:tetris_delete_clipboard_wid)
-    execute clipboard . 'windo :'
-    let clipboard_last_line = line('w$')
-
-    let y = 0
-    let is_max = v:false
-    let config = nvim_win_get_config(a:win_id)
-    let max_y = float2nr(config.row - clipboard_config.row - clipboard_last_line + 1)
-
-    for _ in range(0, float2nr(clipboard_config.col))
-        let config = nvim_win_get_config(a:win_id)
-        let y += 1
-        if is_max
-            call s:move_floating_window(a:win_id, config.relative, config.row, config.col + 1)
-        else
-            call s:move_floating_window(a:win_id, config.relative, config.row - 1, config.col + 1)
-        endif
-        if y == max_y
-            let is_max = v:true
-        endif
-        sleep 1ms
-    endfor
-endfunction
-
-" Get text from window
-function! s:get_text(win_id) abort
-    let win = s:winid2tabnr(a:win_id)
-    execute win . 'windo :'
-    return getline('.')
-endfunction
-
-" Convert window ID to tab number
-function! s:winid2tabnr(win_id) abort
-    return win_id2tabwin(a:win_id)[1]
-endfunction
-
-" Generate random number
-function! s:random(max) abort
-    return str2nr(matchstr(reltimestr(reltime()), '\v\.@<=\d+')[1:]) % a:max
-endfunction
-
-" Main function - public interface
+" Main function
 function! tetris_delete#main() abort
-    " Ensure clipboard window exists
-    if g:tetris_delete_auto_clipboard && !s:is_exist_clipboard_window()
-        let g:tetris_delete_clipboard_wid = s:create_clipboard_window()
-        call s:focus_to_main_window()
-    endif
-
-    if !s:is_exist_clipboard_window()
-        echohl WarningMsg
-        echo "Clipboard window not open. Run :TetrisDeleteOpen first."
-        echohl None
-        return
-    endif
-
     " Create word windows
     let win_ids = s:create_words_window()
 
-    " Fall current line
+    " Clear current line and fall
     call setline('.', '')
     for win_id in win_ids
         call s:fall_window(win_id)
     endfor
+
+    " Delete the line
     execute 'normal dd'
 
-    " Move windows to clipboard window
-    let text = ''
-    for win_id in win_ids
-        call s:move_split_window_to_clip_window(win_id)
-        let text .= s:get_text(win_id)
-    endfor
-
-    " Set current line string to clipboard window
-    let clipboard = s:winid2tabnr(g:tetris_delete_clipboard_wid)
-    execute clipboard . 'windo :'
-    call setline('.', text)
-    redraw
-    execute 'normal o'
-    call s:focus_to_main_window()
-
-    " Close each floating window
+    " Close floating windows
     for win_id in win_ids
         call nvim_win_close(win_id, v:true)
     endfor
-endfunction
-
-" Open clipboard window
-function! tetris_delete#open_clipboard() abort
-    if s:is_exist_clipboard_window()
-        echo "Clipboard window already open."
-        return
-    endif
-    let g:tetris_delete_clipboard_wid = s:create_clipboard_window()
-    call s:focus_to_main_window()
-    echo "Clipboard window opened."
-endfunction
-
-" Close clipboard window
-function! tetris_delete#close_clipboard() abort
-    if !s:is_exist_clipboard_window()
-        echo "Clipboard window not open."
-        return
-    endif
-    call nvim_win_close(g:tetris_delete_clipboard_wid, v:true)
-    let g:tetris_delete_clipboard_wid = 0
-    echo "Clipboard window closed."
-endfunction
-
-" Toggle clipboard window
-function! tetris_delete#toggle_clipboard() abort
-    if s:is_exist_clipboard_window()
-        call tetris_delete#close_clipboard()
-    else
-        call tetris_delete#open_clipboard()
-    endif
 endfunction
