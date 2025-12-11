@@ -1,6 +1,6 @@
 # vim-tetris-delete
 
-Tetris-style line deletion with colorful floating windows for NeoVim.
+Tetris-style line deletion with colorful floating Windows for NeoVim.
 
 ## Description
 
@@ -52,6 +52,9 @@ nnoremap <silent> T :TetrisDelete<CR>
 
 " Number of blocks to split line into (default: 7)
 let g:tetris_delete_split_num = 5
+
+" Fall speed in milliseconds (default: 4, lower = faster)
+let g:tetris_delete_fall_speed = 4
 ```
 
 ## License
