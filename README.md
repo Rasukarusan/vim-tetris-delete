@@ -47,8 +47,8 @@ use 'Rasukarusan/vim-tetris-delete'
 ## Configuration
 
 ```vim
-" Key mapping (set your preferred key)
-nnoremap <silent> T :TetrisDelete<CR>
+" Key mapping (use <Plug> for dot-repeat support)
+nmap <silent> T <Plug>(TetrisDelete)
 
 " Number of blocks to split line into (default: 7)
 let g:tetris_delete_split_num = 5
@@ -56,6 +56,8 @@ let g:tetris_delete_split_num = 5
 " Fall speed in milliseconds (default: 4, lower = faster)
 let g:tetris_delete_fall_speed = 4
 ```
+
+Using `<Plug>(TetrisDelete)` enables `.` to repeat the action.
 
 ## License
 

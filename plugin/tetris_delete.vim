@@ -19,8 +19,11 @@ if !exists('g:tetris_delete_fall_speed')
     let g:tetris_delete_fall_speed = 4
 endif
 
-" Command
-command! TetrisDelete call tetris_delete#main()
+" Plug mapping with dot-repeat support (no plugin required)
+nnoremap <silent> <Plug>(TetrisDelete) :set operatorfunc=tetris_delete#operator<CR>g@l
+
+" Command (uses Plug mapping for dot-repeat support)
+command! TetrisDelete execute "normal \<Plug>(TetrisDelete)"
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
