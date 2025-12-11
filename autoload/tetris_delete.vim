@@ -116,27 +116,47 @@ endfunction
 
 " Delete multiple lines at once
 function! tetris_delete#delete_lines(count) abort
-    let all_win_ids = []
+    let lines_win_ids = []
     let start_line = line('.')
 
-    " Create windows for all lines
+    " Create windows for all lines (keep each line's windows separate)
     for i in range(a:count)
         execute "normal! " . (start_line + i) . "G"
         let win_ids = s:create_words_window()
-        call extend(all_win_ids, win_ids)
+        call add(lines_win_ids, win_ids)
         call setline('.', '')
     endfor
 
-    " Fall all windows together
+    " Get max block count across all lines
+    let max_blocks = 0
+    for win_ids in lines_win_ids
+        if len(win_ids) > max_blocks
+            let max_blocks = len(win_ids)
+        endif
+    endfor
+
     let move_y = line('w$') - start_line
-    for y in range(0, move_y)
-        for win_id in all_win_ids
-            if nvim_win_is_valid(win_id)
-                let config = nvim_win_get_config(win_id)
-                call s:move_floating_window(win_id, config.relative, config.row + 1, config.col)
+
+    " Fall blocks one by one (but all lines together)
+    for block_idx in range(max_blocks)
+        " Collect the block at this index from each line
+        let current_blocks = []
+        for win_ids in lines_win_ids
+            if block_idx < len(win_ids)
+                call add(current_blocks, win_ids[block_idx])
             endif
         endfor
-        execute 'sleep ' . g:tetris_delete_fall_speed . 'm'
+
+        " Fall these blocks together
+        for y in range(0, move_y)
+            for win_id in current_blocks
+                if nvim_win_is_valid(win_id)
+                    let config = nvim_win_get_config(win_id)
+                    call s:move_floating_window(win_id, config.relative, config.row + 1, config.col)
+                endif
+            endfor
+            execute 'sleep ' . g:tetris_delete_fall_speed . 'm'
+        endfor
     endfor
 
     " Delete lines
@@ -144,10 +164,12 @@ function! tetris_delete#delete_lines(count) abort
     execute "normal! " . a:count . "dd"
 
     " Close all windows
-    for win_id in all_win_ids
-        if nvim_win_is_valid(win_id)
-            call nvim_win_close(win_id, v:true)
-        endif
+    for win_ids in lines_win_ids
+        for win_id in win_ids
+            if nvim_win_is_valid(win_id)
+                call nvim_win_close(win_id, v:true)
+            endif
+        endfor
     endfor
 endfunction
 
