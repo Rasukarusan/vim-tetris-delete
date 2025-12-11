@@ -15,6 +15,10 @@ if !exists('g:tetris_delete_split_num')
     let g:tetris_delete_split_num = 7
 endif
 
+if !exists('g:tetris_delete_fall_speed')
+    let g:tetris_delete_fall_speed = 4
+endif
+
 " Command
 command! TetrisDelete call tetris_delete#main()
 

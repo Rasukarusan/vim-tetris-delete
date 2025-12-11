@@ -61,6 +61,11 @@ g:tetris_delete_split_num (default: 7)
     Number of blocks to split the line into. >
         let g:tetris_delete_split_num = 5
 <
+                                                 *g:tetris_delete_fall_speed*
+g:tetris_delete_fall_speed (default: 4)
+    Fall speed in milliseconds. Lower value = faster. >
+        let g:tetris_delete_fall_speed = 2
+<
 Key mapping example: >
     nnoremap <silent> T :TetrisDelete<CR>
 <

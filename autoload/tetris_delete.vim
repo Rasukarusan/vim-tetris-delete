@@ -58,7 +58,7 @@ function! s:fall_window(win_id) abort
     let config = nvim_win_get_config(a:win_id)
     for y in range(0, move_y)
         call s:move_floating_window(a:win_id, config.relative, config.row + y + 1, config.col)
-        sleep 4ms
+        execute 'sleep ' . g:tetris_delete_fall_speed . 'm'
     endfor
 endfunction
 
