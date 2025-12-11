@@ -6,7 +6,8 @@ Tetris-style line deletion with colorful floating Windows for NeoVim.
 
 Delete a line with Tetris-style falling animation. The line splits into colorful blocks and falls down!
 
-![Demo](https://user-images.githubusercontent.com/17779386/69768177-e7e39200-11c2-11ea-8c96-14b6a431dfc8.gif)
+![demo](https://github.com/user-attachments/assets/c23a0115-67b1-40d2-8286-7bbfe687d351)
+
 
 ## Requirements
 
