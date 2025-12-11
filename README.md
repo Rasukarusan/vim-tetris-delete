@@ -44,11 +44,16 @@ use 'Rasukarusan/vim-tetris-delete'
 2. Run `:TetrisDelete`
 3. Watch the line split into colorful blocks and fall!
 
+### Multiple Lines
+
+Select lines in visual mode and execute the mapping.
+
 ## Configuration
 
 ```vim
 " Key mapping (use <Plug> for dot-repeat support)
 nmap <silent> T <Plug>(TetrisDelete)
+xmap <silent> T <Plug>(TetrisDelete)
 
 " Number of blocks to split line into (default: 7)
 let g:tetris_delete_split_num = 5

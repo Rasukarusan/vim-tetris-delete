@@ -111,19 +111,15 @@ endfunction
 
 " Main function
 function! tetris_delete#main() abort
-    " Create word windows
     let win_ids = s:create_words_window()
 
-    " Clear current line and fall
     call setline('.', '')
     for win_id in win_ids
         call s:fall_window(win_id)
     endfor
 
-    " Delete the line
     execute 'normal dd'
 
-    " Close floating windows
     for win_id in win_ids
         call nvim_win_close(win_id, v:true)
     endfor
@@ -132,4 +128,22 @@ endfunction
 " Operator function for dot-repeat
 function! tetris_delete#operator(...) abort
     call tetris_delete#main()
+endfunction
+
+" Visual mode function
+function! tetris_delete#visual() abort
+    let count = line("'>") - line("'<") + 1
+    execute "normal! '<"
+    for _ in range(count)
+        call tetris_delete#main()
+    endfor
+endfunction
+
+" Command function (supports range)
+function! tetris_delete#command(line1, line2) abort
+    let count = a:line2 - a:line1 + 1
+    execute "normal! " . a:line1 . "G"
+    for _ in range(count)
+        call tetris_delete#main()
+    endfor
 endfunction
