@@ -109,19 +109,45 @@ function! s:create_words_window() abort
     return win_ids
 endfunction
 
-" Main function
+" Main function (single line)
 function! tetris_delete#main() abort
-    let win_ids = s:create_words_window()
+    call tetris_delete#delete_lines(1)
+endfunction
 
-    call setline('.', '')
-    for win_id in win_ids
-        call s:fall_window(win_id)
+" Delete multiple lines at once
+function! tetris_delete#delete_lines(count) abort
+    let all_win_ids = []
+    let start_line = line('.')
+
+    " Create windows for all lines
+    for i in range(a:count)
+        execute "normal! " . (start_line + i) . "G"
+        let win_ids = s:create_words_window()
+        call extend(all_win_ids, win_ids)
+        call setline('.', '')
     endfor
 
-    execute 'normal dd'
+    " Fall all windows together
+    let move_y = line('w$') - start_line
+    for y in range(0, move_y)
+        for win_id in all_win_ids
+            if nvim_win_is_valid(win_id)
+                let config = nvim_win_get_config(win_id)
+                call s:move_floating_window(win_id, config.relative, config.row + 1, config.col)
+            endif
+        endfor
+        execute 'sleep ' . g:tetris_delete_fall_speed . 'm'
+    endfor
 
-    for win_id in win_ids
-        call nvim_win_close(win_id, v:true)
+    " Delete lines
+    execute "normal! " . start_line . "G"
+    execute "normal! " . a:count . "dd"
+
+    " Close all windows
+    for win_id in all_win_ids
+        if nvim_win_is_valid(win_id)
+            call nvim_win_close(win_id, v:true)
+        endif
     endfor
 endfunction
 
@@ -134,16 +160,12 @@ endfunction
 function! tetris_delete#visual() abort
     let count = line("'>") - line("'<") + 1
     execute "normal! '<"
-    for _ in range(count)
-        call tetris_delete#main()
-    endfor
+    call tetris_delete#delete_lines(count)
 endfunction
 
 " Command function (supports range)
 function! tetris_delete#command(line1, line2) abort
     let count = a:line2 - a:line1 + 1
     execute "normal! " . a:line1 . "G"
-    for _ in range(count)
-        call tetris_delete#main()
-    endfor
+    call tetris_delete#delete_lines(count)
 endfunction
