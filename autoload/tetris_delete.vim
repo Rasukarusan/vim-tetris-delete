@@ -128,3 +128,8 @@ function! tetris_delete#main() abort
         call nvim_win_close(win_id, v:true)
     endfor
 endfunction
+
+" Operator function for dot-repeat
+function! tetris_delete#operator(...) abort
+    call tetris_delete#main()
+endfunction
