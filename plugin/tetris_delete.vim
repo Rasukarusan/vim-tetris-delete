@@ -24,7 +24,7 @@ nnoremap <silent> <Plug>(TetrisDelete) :<C-u>set operatorfunc=tetris_delete#oper
 xnoremap <silent> <Plug>(TetrisDelete) :<C-u>call tetris_delete#visual()<CR>
 
 " Command
-command! -range TetrisDelete call tetris_delete#command(<line1>, <line2>)
+command! -range TetrisDelete call tetris_delete#cmd(<line1>, <line2>)
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

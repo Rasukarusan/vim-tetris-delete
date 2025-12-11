@@ -185,9 +185,13 @@ function! tetris_delete#visual() abort
     call tetris_delete#delete_lines(count)
 endfunction
 
-" Command function (supports range)
-function! tetris_delete#command(line1, line2) abort
-    let count = a:line2 - a:line1 + 1
-    execute "normal! " . a:line1 . "G"
-    call tetris_delete#delete_lines(count)
+" Command wrapper (single line uses operatorfunc for dot-repeat)
+function! tetris_delete#cmd(line1, line2) abort
+    if a:line1 == a:line2
+        let &operatorfunc = 'tetris_delete#operator'
+        call feedkeys("g@l", 'n')
+    else
+        execute "normal! " . a:line1 . "G"
+        call tetris_delete#delete_lines(a:line2 - a:line1 + 1)
+    endif
 endfunction
